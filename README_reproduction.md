@@ -20,6 +20,7 @@ The core model only requires `numpy`. Plotting scripts require `matplotlib`.
 
 ```bash
 python scripts/smoke_test.py
+python scripts/audit_no_figure_inputs.py
 ```
 
 ## Reproduction scripts
@@ -40,6 +41,9 @@ Outputs are written to `outputs/data/` and `outputs/figures/`.
 
 ## Important reproduction notes
 
+- The reproduction code does not digitize or read the paper's plotted figures.
+  It is generated from the model equations and simulation settings reported in
+  the text/captions. See `docs/reproduction_audit.md`.
 - The paper reports QS simulation with a history of 50 active configurations
   and probability 0.2. This implementation uses the standard convention:
   absorption is always replaced by a stored active configuration, and `0.2` is

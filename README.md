@@ -31,6 +31,7 @@ pip install -r requirements.txt
 
 ```bash
 python scripts/smoke_test.py
+python scripts/audit_no_figure_inputs.py
 python scripts/run_all.py --quick
 ```
 
@@ -56,6 +57,7 @@ Running all scripts without `--quick` may take a long time.
 ## Important Notes
 
 - The publisher PDF is intentionally not committed, because this repository is public.
+- The reproduction scripts do not digitize, read, or copy data from the paper figures. Run `python scripts/audit_no_figure_inputs.py` to check this guardrail.
 - The empirical congressional cosponsorship hypergraph used for Fig. 7 is not bundled with the paper or this workspace, so Fig. 7 is not reproduced here.
 - The spontaneous isolation strategy in the paper has a small ambiguity: the algorithm sorts candidate hyperedges by activity in descending order, while the text sometimes interprets SI as targeting severely suppressed low-activity hyperedges. The default follows the algorithm, and scripts expose `--si-sort ascending` for sensitivity checks.
 - For Figs. 4-5, immunization is applied once after a burn-in period. The paper does not fully specify whether hidden code applies interventions once, continuously, or cumulatively, so this convention is documented explicitly.
@@ -68,5 +70,6 @@ scripts/                     Reproduction entry points
 outputs/data/                Quick-run CSV outputs
 outputs/figures/             Quick-run PNG outputs
 docs/original_request.md     Original user research request
+docs/reproduction_audit.md   Guardrail against figure-derived reproduction
 README_reproduction.md       Extra reproduction notes
 ```
