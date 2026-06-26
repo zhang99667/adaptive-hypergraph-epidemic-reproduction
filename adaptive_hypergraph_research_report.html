@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>自适应超图传播动力学论文科研头脑风暴报告</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent2: #0f766e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --ok: #047857;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.68;
+      overflow-x: hidden;
+    }
+    .layout-with-toc {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 24px;
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+      transition: grid-template-columns .2s ease;
+    }
+    .layout-with-toc.toc-collapsed { grid-template-columns: 52px minmax(0, 1fr); }
+    main { min-width: 0; }
+    .toc {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      padding: 16px;
+    }
+    .toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+    .toc-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .toc-toggle {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .toc a {
+      display: block;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .toc a:hover { background: #f1f5f9; color: var(--accent); }
+    .layout-with-toc.toc-collapsed .toc { padding: 10px; overflow: visible; }
+    .layout-with-toc.toc-collapsed .toc-header { justify-content: center; margin-bottom: 0; }
+    .layout-with-toc.toc-collapsed .toc-title,
+    .layout-with-toc.toc-collapsed .toc a { display: none; }
+    .layout-with-toc.toc-collapsed .toc-toggle { width: 32px; height: 32px; }
+    section[id], h2[id] { scroll-margin-top: 24px; }
+
+    .doc-header {
+      margin-bottom: 18px;
+      padding: 28px 30px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 58%, #5eead4 100%);
+      color: #ffffff;
+      box-shadow: 0 14px 32px rgba(37, 99, 235, .20);
+    }
+    .doc-header h1 { margin: 0 0 12px; font-size: 30px; line-height: 1.28; }
+    .doc-subtitle { margin: 0 0 18px; color: rgba(255,255,255,.88); font-size: 15px; }
+    .doc-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+    .doc-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 3px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.16);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    h2 {
+      margin: 30px 0 14px;
+      font-size: 22px;
+      border-left: 5px solid var(--accent);
+      padding-left: 10px;
+    }
+    h3 { margin: 18px 0 8px; font-size: 18px; }
+    h4 { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+    p { margin: 8px 0; }
+    ul, ol { margin: 8px 0 8px 22px; padding: 0; }
+    li { margin: 4px 0; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1px 5px;
+      font-size: .92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .summary, .issue {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      padding: 18px 20px;
+      margin: 16px 0;
+      min-width: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+    .mini {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fbfdff;
+      min-width: 0;
+    }
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      vertical-align: 1px;
+    }
+    .p0 { background: #b91c1c; }
+    .p1 { background: #ea580c; }
+    .p2 { background: #2563eb; }
+    .p3 { background: #0f766e; }
+    .muted { color: var(--muted); }
+    .ok { color: var(--ok); font-weight: 800; }
+    .warn { color: var(--warn); font-weight: 800; }
+    .bad { color: var(--bad); font-weight: 800; }
+    .tbl-wrap { overflow-x: auto; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      background: #f1f5f9;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      color: #0f172a;
+    }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: #f8fafc; }
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 12px;
+    }
+    .formula-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 13px;
+      background: #ffffff;
+      padding: 14px 15px;
+      min-width: 0;
+    }
+    .formula-title { font-weight: 800; margin: 0 0 8px; color: #0f172a; }
+    .formula {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      font-family: "Times New Roman", "STIX Two Text", serif;
+      font-size: 18px;
+      color: #0f172a;
+    }
+    .frac {
+      display: inline-grid;
+      grid-template-rows: auto auto;
+      align-items: center;
+      justify-items: center;
+      vertical-align: middle;
+      margin: 0 2px;
+      line-height: 1.2;
+    }
+    .frac > span:first-child {
+      border-bottom: 1px solid currentColor;
+      padding: 0 4px 1px;
+      min-width: 100%;
+      text-align: center;
+    }
+    .frac > span:last-child { padding: 1px 4px 0; text-align: center; }
+    .formula-note { margin-top: 8px; font-size: 14px; color: #475569; }
+    details {
+      margin: 12px 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    summary {
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      background: #f8fafc;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::before {
+      content: "▸";
+      display: inline-block;
+      font-size: 10px;
+      transition: transform .2s;
+      color: var(--muted);
+    }
+    details[open] summary::before { transform: rotate(90deg); }
+    .details-body { padding: 12px 16px; }
+    .source-list a { color: #1d4ed8; }
+    .path {
+      display: inline-block;
+      background: #eef2ff;
+      color: #3730a3;
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+    @media (max-width: 900px) {
+      .layout-with-toc { display: block; padding: 20px 16px 44px; }
+      .toc { position: static; max-height: none; margin-bottom: 16px; overflow: visible; }
+      .layout-with-toc.toc-collapsed .toc { padding: 16px; }
+      .layout-with-toc.toc-collapsed .toc-header { justify-content: space-between; margin-bottom: 0; }
+      .layout-with-toc.toc-collapsed .toc-title { display: block; }
+      .doc-header { padding: 22px 20px; border-radius: 14px; }
+      .doc-header h1 { font-size: 24px; }
+      h2 { font-size: 19px; }
+      .formula-grid, .grid { grid-template-columns: 1fr; }
+      .formula { font-size: 16px; }
+    }
+    @media print {
+      body { background: #ffffff; color: #111827; }
+      .layout-with-toc { display: block; padding: 0; max-width: none; }
+      .toc { position: static; box-shadow: none; max-height: none; }
+      .summary, .issue, .doc-header { box-shadow: none; break-inside: avoid; }
+      .doc-header { background: #ffffff; color: #111827; border: 1px solid #d1d5db; }
+      .doc-chip { background: #f3f4f6; color: #111827; border: 1px solid #d1d5db; }
+      a { color: #111827; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout-with-toc">
+  <aside class="toc" aria-label="目录">
+    <div class="toc-header">
+      <p class="toc-title">目录</p>
+      <button class="toc-toggle" type="button" aria-label="收起目录" aria-expanded="true" title="收起目录">
+        <span class="toc-toggle-icon" aria-hidden="true">‹</span>
+      </button>
+    </div>
+    <a href="#summary">核心结论</a>
+    <a href="#reproduction">一、代码复现分析</a>
+    <a href="#theory">二、理论深度解析</a>
+    <a href="#innovation">三、创新点拆解</a>
+    <a href="#extensions">四、扩展方向头脑风暴</a>
+    <a href="#selection">五、最优扩展选择</a>
+    <a href="#model">六、完整模型构建</a>
+    <a href="#experiments">七、实验设计</a>
+    <a href="#sources">证据来源</a>
+  </aside>
+
+  <main>
+    <header class="doc-header">
+      <h1>自适应超图传播动力学论文科研头脑风暴报告</h1>
+      <p class="doc-subtitle">围绕 <i>Adaptive Epidemic Dynamics on Hypergraphs with Group-Level Immunization and Rewiring</i>，从复现、理论、创新、可发表扩展模型到实验设计做导师式拆解。</p>
+      <div class="doc-meta">
+        <span class="doc-chip">论文/文献阅读报告</span>
+        <span class="doc-chip">复杂网络传播动力学</span>
+        <span class="doc-chip">MMCA 与非线性分岔</span>
+        <span class="doc-chip">整理日期：2026-06-26</span>
+        <span class="doc-chip">本地 PDF：15 页</span>
+      </div>
+    </header>
+
+    <section id="summary" class="summary">
+      <h2>核心结论</h2>
+      <div class="grid">
+        <div class="mini"><span class="tag p0">复现边界</span> 当前工作区没有仿真代码。arXiv 源文件只包含 <code>main.tex</code>、参考文献和图像 PDF，因此不能逐行审计作者代码，只能逆向给出论文级复现流程。</div>
+        <div class="mini"><span class="tag p1">理论主线</span> 论文核心是二维同质 MMCA：感染密度 <code>ρ</code> 与超边活动 <code>Θ</code> 反馈耦合。对 <code>d ≥ 3</code>，无病态始终线性稳定，流行态经 saddle-node 出现。</div>
+        <div class="mini"><span class="tag p2">主要风险</span> SI 策略排序、免疫是否逐步累积、QS 方法概率含义、去激活超边是否参与 rewiring，这些地方叙述不够精确，是复现误差的主要来源。</div>
+        <div class="mini"><span class="tag p3">最佳扩展</span> 建议做“风险感知-行为记忆自适应超边 SIS”。它只增加一个可解析记忆状态，却能引入记忆诱导振荡、稳定性转换和离散 Hopf 分岔，适合写成独立论文。</div>
+      </div>
+    </section>
+
+    <h2 id="reproduction">一、代码复现分析</h2>
+    <section class="issue">
+      <h3>1.1 当前文件与“代码”状态</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>文件或目录</th><th>作用</th><th>能否用于复现</th><th>判断</th></tr></thead>
+          <tbody>
+            <tr><td><span class="path">README.md</span></td><td>内容就是用户本次任务文本。</td><td>否</td><td>不是论文代码或实验说明。</td></tr>
+            <tr><td><span class="path">Li 等 - 2027 - Adaptive epidemic dynamics...pdf</span></td><td>论文正式 PDF。</td><td>部分</td><td>可抽取模型、参数、图注和实验设置。</td></tr>
+            <tr><td><span class="path">tmp/pdfs/arxiv_source/main.tex</span></td><td>arXiv TeX 源文件。</td><td>部分</td><td>可核对公式、图名、图像文件映射，但不是仿真代码。</td></tr>
+            <tr><td><span class="path">tmp/pdfs/arxiv_source/figure/*</span></td><td>论文中各图的 PDF 成品。</td><td>否</td><td>只有最终图像，无原始数据和绘图脚本。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>导师判断：</b>这篇论文的公开材料目前不满足“完全可复现”的最低要求，因为缺少生成网络、运行 MMCA/MC、应用干预、计算 HIT、绘图的源代码和原始数据。arXiv 页面显示论文已提交并提供 TeX Source，但源包中没有仿真脚本；论文也写明数据可向作者索取，而不是随文公开。</p>
+    </section>
+
+    <section class="issue">
+      <h3>1.2 公式、图像与源文件映射</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>论文对象</th><th>源文件或图文件</th><th>性质</th><th>对应内容</th></tr></thead>
+          <tbody>
+            <tr><td>Eq. 1</td><td><span class="path">main.tex</span></td><td>理论定义</td><td>平均超度 <code>⟨k⟩ = md/n</code>。</td></tr>
+            <tr><td>Eq. 2</td><td><span class="path">main.tex</span></td><td>动力学机制</td><td>超边活动 <code>Θ<sub>e</sub></code> 的感染压力抑制与自恢复。</td></tr>
+            <tr><td>Eq. 3, 8</td><td><span class="path">main.tex</span></td><td>MMCA 闭包</td><td>感染压力 <code>Φ<sub>e</sub> ≈ ∏p<sub>i</sub></code>。</td></tr>
+            <tr><td>Eq. 4, 5</td><td><span class="path">main.tex</span></td><td>微观 MMCA</td><td>节点避免感染概率 <code>q<sub>i</sub></code> 与 <code>p<sub>i</sub></code> 更新。</td></tr>
+            <tr><td>Eq. 12-20</td><td><span class="path">main.tex</span></td><td>同质理论</td><td>二维约化、稳态方程、非线性阈值 <code>β<sub>n</sub></code>。</td></tr>
+            <tr><td>Fig. 1</td><td><span class="path">model.pdf</span></td><td>示意图</td><td>s-SIS、免疫和 rewiring 机制。</td></tr>
+            <tr><td>Fig. 2</td><td><span class="path">figure/test1/test1.pdf</span></td><td>理论 + MC</td><td>MMCA 曲线与 200 次 MC 平均对比。</td></tr>
+            <tr><td>Fig. 3</td><td><span class="path">figure/test2/*.pdf</span></td><td>参数扫描</td><td>初始条件、<code>η</code>、<code>γ</code> 对稳态和时间序列的影响。</td></tr>
+            <tr><td>Fig. 4</td><td><span class="path">figure/test3_1/*.pdf</span></td><td>MC 参数扫描</td><td>不同免疫策略下 <code>ρ<sup>I</sup>-w</code> 曲线。</td></tr>
+            <tr><td>Fig. 5</td><td><span class="path">figure/test3_2/*.pdf</span></td><td>MC 参数扫描</td><td>HIT <code>w<sub>c</sub></code> 随 <code>β</code> 变化。</td></tr>
+            <tr><td>Fig. 6</td><td><span class="path">figure/test4/*.pdf</span></td><td>MC + 拓扑统计</td><td>rewiring 后感染时间序列与度分布。</td></tr>
+            <tr><td>Fig. 7</td><td><span class="path">figure/test5/*.pdf</span></td><td>经验网络验证</td><td>国会议案共署超图上的策略比较。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>1.3 哪些图是理论、MC、参数扫描</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>图</th><th>理论结果</th><th>MC 模拟</th><th>参数扫描</th><th>导师注释</th></tr></thead>
+          <tbody>
+            <tr><td>Fig. 1</td><td>是，概念示意</td><td>否</td><td>否</td><td>用于解释模型结构，不是结果图。</td></tr>
+            <tr><td>Fig. 2(a)</td><td>是，MMCA 稳态曲线</td><td>是，符号点</td><td>是，扫描 <code>β</code> 和 <code>⟨k⟩</code></td><td>这是论文最关键的理论-仿真一致性证据。</td></tr>
+            <tr><td>Fig. 2(b,c)</td><td>是，MMCA 时间演化</td><td>是，MC 时间点</td><td>弱扫描，两个 <code>β</code></td><td>展示阈值两侧的衰亡和流行。</td></tr>
+            <tr><td>Fig. 3</td><td>否，未标注理论曲线</td><td>大概率是 MC 或数值迭代</td><td>是，<code>η</code>、<code>γ</code>、初值</td><td>强调初值依赖和适应反馈。</td></tr>
+            <tr><td>Fig. 4</td><td>否</td><td>是</td><td>是，<code>w</code>、<code>⟨k⟩</code>、<code>γ</code></td><td>策略比较，没有解析公式支撑。</td></tr>
+            <tr><td>Fig. 5</td><td>否</td><td>是</td><td>是，<code>β</code> 和初始感染</td><td>HIT 是数值定义的临界免疫比例。</td></tr>
+            <tr><td>Fig. 6</td><td>否</td><td>是</td><td>是，两种 rewiring</td><td>同时给流行态和度分布。</td></tr>
+            <tr><td>Fig. 7</td><td>否</td><td>是</td><td>是，经验超图上的 <code>β</code>、<code>η</code>、策略</td><td>外部有效性验证，但数据未随文提供。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>1.4 逆向复现流程</h3>
+      <p><b>运行顺序：</b>先生成网络与初始状态，再分别运行同质 MMCA、微观 MMCA 和 MC/QS，最后做策略扫描与绘图。因为作者代码缺失，下面是能够复现论文图型的最小闭环。</p>
+      <ol>
+        <li><b>生成超图：</b>设置 <code>n = 1500</code>、<code>d = 3</code>、<code>m = n⟨k⟩/d</code>。对 <code>⟨k⟩ = 6, 9, 12</code>，对应 <code>m = 3000, 4500, 6000</code>。随机采样不重复的 <code>d</code> 节点子集作为超边。</li>
+        <li><b>初始化：</b>节点以 <code>I(0)</code> 比例感染；通常 <code>I(0)=0.3</code>，Fig. 3 使用 <code>0.2</code> 与 <code>0.8</code>，Fig. 5 使用 <code>0.3</code> 与 <code>0.5</code>。超边活动建议从 <code>Θ<sub>e</sub>(0)=1</code> 开始；rewiring 新边为 <code>Θ<sub>0</sub>=0.1</code>。</li>
+        <li><b>同质 MMCA：</b>迭代 <code>ρ(t+1)</code> 与 <code>Θ(t+1)</code>，用于 Fig. 2 的理论曲线；稳态用末端平均或固定点求解。</li>
+        <li><b>微观 MMCA：</b>对每个节点计算 <code>q<sub>i</sub></code>，对每条超边计算 <code>Φ<sub>e</sub></code> 与 <code>Θ<sub>e</sub></code>，可用于比同质理论更接近 MC 的数值验证。</li>
+        <li><b>MC/QS：</b>每步同步更新感染和恢复；若进入全健康吸收态，用 QS 历史配置恢复。论文给出历史池大小 50 和概率 0.2，但“0.2 是替换历史池概率还是从吸收态恢复概率”表述不够清楚，复现时应做敏感性检查。</li>
+        <li><b>免疫策略：</b>Random 随机选 <code>⌊wm⌋</code> 条活跃超边；TI 按 <code>Φ<sub>e</sub></code> 降序选；SI 先筛 <code>Θ<sub>e</sub> &lt; θ<sub>min</sub></code>。SI<sub>1</sub>、SI<sub>2</sub>、SI<sub>3</sub> 分别对应 <code>θ<sub>min</sub>=0.2,0.4,0.6</code>。</li>
+        <li><b>rewiring：</b>在 <code>t=400</code> 以 TI 去除 <code>w=0.8</code> 超边后，随机或按 <code>(k<sub>i</sub>+α)/(md+nα)</code> 生成新超边，设置 <code>α=1.0</code>。</li>
+        <li><b>输出：</b>每个参数点记录 <code>ρ<sup>I</sup>(t)</code>、稳态 <code>ρ<sup>I</sup></code>、<code>Θ</code>、度分布 <code>P(k)</code>、HIT <code>w<sub>c</sub></code>，200 次独立运行给均值和误差条。</li>
+      </ol>
+      <p><b>复现不一致点：</b><span class="warn">SI 排序和物理解释存在张力</span>。算法写的是候选超边按 <code>Θ<sub>e</sub></code> 降序选前若干；但后文又说 SI<sub>1</sub> 能更早移除“严重抑制、感染压力高”的低活动超边。若严格降序，预算有限时会先选候选集中活动较高者。较合理的解释是：低阈值 SI<sub>1</sub> 本身已筛出极低活动边，因此降序影响较小；但如果要严谨复现，应同时测试升序和降序两版。</p>
+      <p><b>第二个不一致：</b>论文一处说去激活超边不再参与后续 infection or rewiring events，另一处又说 rewiring 用新超边替换 immunized hyperedges 以保持 <code>m</code> 不变。复现时应把“免疫实验”和“rewiring 实验”分开：前者永久删除传播通道，后者在指定时刻替换删除通道。</p>
+    </section>
+
+    <h2 id="theory">二、理论深度解析</h2>
+    <section class="issue">
+      <h3>2.1 模型层：状态、机制、耦合与时间尺度</h3>
+      <p><b>状态变量：</b>节点状态 <code>X<sub>i</sub>(t) ∈ {S,I}</code> 描述疾病；节点概率 <code>p<sub>i</sub>(t)</code> 是 MMCA 中对随机状态的边缘概率；超边活动 <code>Θ<sub>e</sub>(t) ∈ [0,1]</code> 是群体交互强度；感染压力 <code>Φ<sub>e</sub>(t)</code> 是群体内部全感染概率。</p>
+      <p><b>动态机制：</b>感染不是普通 pairwise SIS，而是“除自己外同组 <code>d-1</code> 人全部感染”才触发。这个全体条件把感染项从线性 <code>ρ</code> 变成 <code>ρ<sup>d-1</sup></code>，是非连续相变的根源。</p>
+      <p><b>耦合方式：</b>疫情通过 <code>Φ<sub>e</sub></code> 抑制超边活动；活动再通过 <code>Θ<sub>e</sub>β</code> 抑制感染概率。这是一个负反馈环。<code>η</code> 越大，风险响应越强；<code>γ</code> 越大，恢复社交越快，传播通道越容易重新打开。</p>
+      <p><b>时间尺度：</b>论文默认疾病传播、恢复、活动抑制、活动恢复都在同一个离散时间步内发生。这使模型简洁，但也隐藏了真实系统里行为响应滞后和记忆效应。后续最值得拓展的正是这个时间尺度结构。</p>
+    </section>
+
+    <section class="issue">
+      <h3>2.2 动力学层：转移概率、MMCA、平衡与稳定</h3>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <div class="formula-title">超边感染压力</div>
+          <div class="formula">Φ<sub>e</sub>(t) ≈ ∏<sub>i∈e</sub> p<sub>i</sub>(t)</div>
+          <div class="formula-note">这是 IBMF 闭包：忽略同组节点感染状态相关性。数学上易处理，物理上会低估簇内相关。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">节点避免感染概率</div>
+          <div class="formula">q<sub>i</sub>(t)=∏<sub>e∋i</sub>[1-Θ<sub>e</sub>(t)β∏<sub>j∈e,j≠i</sub>p<sub>j</sub>(t)]</div>
+          <div class="formula-note">每条入射超边独立尝试感染；多条超边的“没有感染”概率相乘。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">节点概率更新</div>
+          <div class="formula">p<sub>i</sub>(t+1)=(1-p<sub>i</sub>)(1-q<sub>i</sub>)+(1-μ)p<sub>i</sub></div>
+          <div class="formula-note">第一项是健康节点被感染，第二项是感染节点未恢复。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">活动更新</div>
+          <div class="formula">Θ<sub>e</sub>(t+1)=Θ<sub>e</sub>(1-ηΦ<sub>e</sub>)+γ(1-Θ<sub>e</sub>)</div>
+          <div class="formula-note">感染压力越高，活动越被压低；活动越低，自恢复项越强。</div>
+        </div>
+      </div>
+      <p><b>平衡条件：</b>同质化后只有两个变量 <code>ρ</code> 和 <code>Θ</code>。稳态活动为 <code>Θ* = γ/(γ+ηρ<sup>d</sup>)</code>，说明只要流行态存在，活动就低于 1；且高 <code>η</code> 或低 <code>γ</code> 会降低有效传播率。</p>
+      <p><b>物理含义：</b>这不是简单“传播率变小”。因为 <code>Θ*</code> 本身依赖 <code>ρ<sup>d</sup></code>，系统出现自抑制：流行越强，群体越退缩，退缩越强，感染又被压低。这种反馈导致同一组参数下可能有无病态与流行态并存。</p>
+    </section>
+
+    <section class="issue">
+      <h3>2.3 数学层：不动点、阈值、Jacobian 与分岔</h3>
+      <p>同质映射可写为：</p>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <div class="formula-title">感染密度映射</div>
+          <div class="formula">F(ρ,Θ)=(1-ρ){1-[1-Θβρ<sup>d-1</sup>]<sup>K</sup>}+(1-μ)ρ</div>
+          <div class="formula-note">其中 <code>K=⟨k⟩</code>。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">活动映射</div>
+          <div class="formula">G(ρ,Θ)=Θ(1-ηρ<sup>d</sup>)+γ(1-Θ)</div>
+          <div class="formula-note">二维离散系统的稳定性由 Jacobian 特征值决定。</div>
+        </div>
+      </div>
+      <p>令 <code>a=1-Θβρ<sup>d-1</sup></code>，Jacobian 为：</p>
+      <div class="formula-card">
+        <div class="formula">
+          J =
+          [ 1-μ-(1-a<sup>K</sup>)+(1-ρ)K a<sup>K-1</sup>Θβ(d-1)ρ<sup>d-2</sup>,
+          (1-ρ)K a<sup>K-1</sup>βρ<sup>d-1</sup>;
+          -ηdΘρ<sup>d-1</sup>, 1-γ-ηρ<sup>d</sup> ]
+        </div>
+        <div class="formula-note">这是本文最应该补进 Methods 的对象。局部稳定当两个特征值模长都小于 1。</div>
+      </div>
+      <p><b>无病不动点：</b><code>(ρ,Θ)=(0,1)</code>。当 <code>d≥3</code>，感染项一阶导数为 0，Jacobian 特征值近似为 <code>1-μ</code> 与 <code>1-γ</code>，所以无病态对任何有限 <code>β</code> 线性稳定。传播不能从无限小扰动启动，必须跨过有限振幅阈值。</p>
+      <p><b>非线性阈值：</b>流行态由自洽方程给出，等价地将 <code>β</code> 表示为 <code>ρ</code> 的函数：</p>
+      <div class="formula-card">
+        <div class="formula">
+          β(ρ)=
+          <span class="frac"><span>1-[1-μρ/(1-ρ)]<sup>1/K</sup></span><span>Θ*(ρ)ρ<sup>d-1</sup></span></span>,
+          &nbsp; Θ*(ρ)=<span class="frac"><span>γ</span><span>γ+ηρ<sup>d</sup></span></span>
+        </div>
+        <div class="formula-note">真正的非线性阈值是 <code>β<sub>n</sub>=min<sub>ρ&gt;0</sub> β(ρ)</code>。极小值点满足切触条件 <code>dβ/dρ=0</code>，对应 saddle-node。</div>
+      </div>
+      <p><b>分岔行为：</b>对 <code>d≥3</code>，无病态不会经线性失稳变成流行态；流行态成对出现，一个稳定一个不稳定。低于 fold 没有流行态；超过 fold 进入双稳区；系统最终到哪个吸引子取决于初始感染密度和活动响应强度。论文 Fig. 3 中“高初始感染反而清零”正是因为强初值触发强活动抑制，直接把系统推入无病吸引域。</p>
+    </section>
+
+    <section class="issue">
+      <h3>2.4 物理意义层：机制竞争和关键参数</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>参数</th><th>数学角色</th><th>物理意义</th><th>可发表观察</th></tr></thead>
+          <tbody>
+            <tr><td><code>β</code></td><td>感染项线性系数，但乘 <code>ρ<sup>d-1</sup></code></td><td>群体中满足传播条件后的感染强度</td><td>决定是否越过 saddle-node。</td></tr>
+            <tr><td><code>d</code></td><td>非线性阶数</td><td>群体传播所需“共同感染人数”</td><td><code>d≥3</code> 是一阶转变来源。</td></tr>
+            <tr><td><code>⟨k⟩</code></td><td>超边尝试次数指数 <code>K</code></td><td>个体参与多少群体</td><td>提高有效感染机会，降低阈值。</td></tr>
+            <tr><td><code>η</code></td><td>活动抑制强度</td><td>风险响应敏感性</td><td>扩大无病区，增强自隔离。</td></tr>
+            <tr><td><code>γ</code></td><td>活动恢复强度</td><td>社会活动恢复速度</td><td>促进反弹，是控制失败的重要参数。</td></tr>
+            <tr><td><code>w</code></td><td>超边删除比例</td><td>外部干预资源</td><td>HIT 不是静态值，而是与适应反馈共同决定。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>最重要的机制竞争：</b>感染传播需要高活动 <code>Θ</code> 和足够高 <code>ρ<sup>d-1</sup></code>，而活动抑制需要高 <code>ρ<sup>d</sup></code>。这意味着中等感染可能最危险：足以维持传播，但不足以触发强烈群体退缩；非常高的感染反而可能触发全局活动塌缩。</p>
+    </section>
+
+    <h2 id="innovation">三、创新点拆解</h2>
+    <section class="issue">
+      <h3>3.1 真创新、常规工作和可删内容</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>层级</th><th>内容</th><th>评价</th><th>导师建议</th></tr></thead>
+          <tbody>
+            <tr><td>一级创新点</td><td>把 s-SIS 高阶传播与动态超边活动 <code>Θ<sub>e</sub></code> 耦合，并给出同质 MMCA 非线性阈值。</td><td>这是论文最硬的理论贡献。</td><td>后续研究应沿着“新动态变量导致新分岔”继续做。</td></tr>
+            <tr><td>一级创新点</td><td>把免疫和 rewiring 放在超边层而不是节点或普通边层。</td><td>问题设置有现实意义。</td><td>需要补强解析理论，否则策略部分偏仿真。</td></tr>
+            <tr><td>二级创新点</td><td>TI 使用动态感染压力 <code>Φ<sub>e</sub></code> 排名。</td><td>比静态结构排名更合理，但属于自然延伸。</td><td>可以和最优控制或资源调度结合。</td></tr>
+            <tr><td>二级创新点</td><td>SI 使用活动阈值触发自发隔离。</td><td>物理解释好，但算法排序需澄清。</td><td>建议改成风险记忆或阈值滞后来提升新意。</td></tr>
+            <tr><td>常规工作</td><td>ER 型均匀超图、MC/QS 验证、热图参数扫描、随机基线。</td><td>必要但不是创新。</td><td>保留作为支撑，不应在摘要中过度强调。</td></tr>
+            <tr><td>可删或压缩</td><td>过长的背景综述、Fig. 4 与 Fig. 5 的部分重复策略结论。</td><td>影响论文聚焦。</td><td>压缩后腾出空间给 Jacobian 和策略复现细节。</td></tr>
+            <tr><td>值得深入</td><td>稳定性边界、振荡机制、干预策略闭式 HIT、异质超图理论。</td><td>这些是下一篇论文的入口。</td><td>优先做能推阈值和分岔的扩展。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>3.2 可发表创新点分级</h3>
+      <ul>
+        <li><b>一级可发表：</b>引入新的慢变量或记忆变量，使原本只有 saddle-node 的系统出现可解析的 Neimark-Sacker 分岔、振荡和多稳态。</li>
+        <li><b>二级可发表：</b>把静态免疫预算 <code>w</code> 改为动态控制变量 <code>w(t)</code>，推导最优控制或脉冲控制阈值。</li>
+        <li><b>三级可发表：</b>把均匀超图推广到异质超边尺寸，并给出 size-dependent MMCA 与阈值；这是论文结论段也承认的自然扩展。</li>
+      </ul>
+    </section>
+
+    <h2 id="extensions">四、扩展方向头脑风暴</h2>
+    <section class="issue">
+      <p>下面这些方向遵守两个原则：第一，保留 MMCA 可写和阈值可推；第二，不只是多加参数，而是引入新的动力学机制。</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>方向</th><th>新机制</th><th>新状态/参数</th><th>理论可推</th><th>阈值</th><th>MMCA</th><th>发表性</th></tr></thead>
+          <tbody>
+            <tr><td>1. 风险感知-行为记忆</td><td>群体不按即时感染压力反应，而按记忆风险反应</td><td><code>R<sub>e</sub></code>，记忆速率 <code>λ</code>，感知饱和 <code>κ</code></td><td>强</td><td>可得非线性阈值</td><td>三维闭合</td><td>★★★★★</td></tr>
+            <tr><td>2. 高阶意识层耦合</td><td>信息/风险意识在另一层传播，反过来降低 <code>β</code> 或提高 <code>η</code></td><td><code>A<sub>i</sub></code>，意识传播率 <code>β<sub>A</sub></code>，遗忘率</td><td>中强</td><td>可得耦合阈值</td><td>可写 multiplex MMCA</td><td>★★★★★</td></tr>
+            <tr><td>3. 演化博弈参与决策</td><td>个体在参与群体和回避群体之间博弈，收益取决于社交收益与感染成本</td><td>策略 <code>C/D</code>，选择强度 <code>s</code>，成本 <code>c</code></td><td>中</td><td>可得近似阈值</td><td>需策略-疾病联合 MMCA</td><td>★★★★★</td></tr>
+            <tr><td>4. 感染感知 rewiring</td><td>新超边不是随机或按度，而是避开高风险节点或高风险群体组合</td><td>风险偏置 <code>χ</code>，混合比例</td><td>中</td><td>异质近似可得</td><td>可写但需度类闭包</td><td>★★★★</td></tr>
+            <tr><td>5. 异质超边尺寸</td><td>超边大小分布不固定，传播项为不同阶数混合</td><td><code>P(d)</code>，<code>β<sub>d</sub></code>，<code>η<sub>d</sub></code></td><td>强</td><td>可得生成函数阈值</td><td>可写 size-class MMCA</td><td>★★★★</td></tr>
+            <tr><td>6. Pairwise + higher-order 混合感染</td><td>传播同时来自普通边和三角/超边</td><td><code>β<sub>1</sub></code>，<code>β<sub>d</sub></code></td><td>强</td><td>线性阈值 + 非线性 fold</td><td>可写</td><td>★★★★</td></tr>
+            <tr><td>7. 群体 quorum 决策</td><td>超边是否活跃取决于组内愿意参与者是否超过法定比例</td><td>参与意愿 <code>Y<sub>i</sub></code>，quorum <code>r</code></td><td>中</td><td>可得近似阈值</td><td>需二项闭包</td><td>★★★★</td></tr>
+            <tr><td>8. 周期时变超图</td><td>超边活动受日周期/学期周期驱动，疫情反馈叠加周期力</td><td>周期振幅 <code>A</code>，频率 <code>ω</code></td><td>中强</td><td>Floquet 阈值</td><td>可写时变 MMCA</td><td>★★★★</td></tr>
+            <tr><td>9. 脉冲/最优控制</td><td>免疫预算在时间上可调度，不是固定 <code>w</code></td><td><code>w(t)</code>，控制成本 <code>C(w)</code></td><td>中</td><td>控制再生数或最优阈值</td><td>可写受控 MMCA</td><td>★★★★</td></tr>
+            <tr><td>10. 非 Markov 恢复</td><td>感染恢复取决于感染年龄或阶段</td><td>阶段 <code>I<sub>1</sub>...I<sub>r</sub></code>，阶段转移率</td><td>强</td><td>next-generation 阈值</td><td>高维但线性</td><td>★★★</td></tr>
+            <tr><td>11. 多层超图</td><td>家庭、工作、线上社交为不同超图层，层间状态耦合</td><td>层活动 <code>Θ<sup>ℓ</sup></code>，层权重</td><td>中</td><td>谱半径或非线性阈值</td><td>可写但复杂</td><td>★★★★</td></tr>
+            <tr><td>12. 感染剂量累积</td><td>个体不是一次感染，而是累积多组暴露剂量后感染</td><td>剂量 <code>D<sub>i</sub></code>，衰减率 <code>δ</code>，阈值</td><td>中</td><td>可得近似阈值</td><td>需剂量分布闭包</td><td>★★★★</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <h2 id="selection">五、选择最优扩展模型</h2>
+    <section class="issue">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>评价目标</th><th>最佳方案</th><th>原因</th></tr></thead>
+          <tbody>
+            <tr><td>最容易发表</td><td>风险感知-行为记忆</td><td>和本文无缝衔接，同时能产生新的振荡与分岔结论。</td></tr>
+            <tr><td>最容易推理论</td><td>混合 pairwise + higher-order</td><td>只是在感染项中加入线性和非线性通道，阈值清楚。</td></tr>
+            <tr><td>最容易做 MC</td><td>感染感知 rewiring</td><td>只需改采样规则，仿真成本低。</td></tr>
+            <tr><td>创新性最高</td><td>演化博弈参与决策</td><td>把社会收益、感染风险和群体形成统一起来，机制更深。</td></tr>
+            <tr><td>综合最优</td><td><b>风险感知-行为记忆自适应超边 SIS</b></td><td>理论、仿真、论文叙事和可控创新之间最均衡。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>导师建议：</b>博士论文或 SCI 论文最忌“只把参数表变长”。风险记忆模型的优点是：原模型是即时反馈，你的新模型是滞后反馈；原模型主要讨论 saddle-node，你可以讨论 saddle-node 与 Neimark-Sacker 共存；原模型稳态阈值来自高阶非线性，你可以证明记忆不一定改变 fold 位置，但显著改变稳定性和过渡路径。这就是干净的新机制。</p>
+    </section>
+
+    <h2 id="model">六、完整模型构建：风险感知-行为记忆自适应超边 SIS</h2>
+    <section class="issue">
+      <h3>6.1 网络结构与状态定义</h3>
+      <p>网络为 <code>d</code>-uniform hypergraph <code>H(V,E)</code>。每个节点有疾病状态 <code>X<sub>i</sub>∈{S,I}</code>；每条超边有活动 <code>Θ<sub>e</sub>∈[0,1]</code>；新增风险记忆状态 <code>R<sub>e</sub>∈[0,1]</code>，表示群体对过去感染压力的感知风险。</p>
+      <p>新参数：<code>λ∈(0,1]</code> 是风险记忆更新速率，<code>κ≥0</code> 是风险感知饱和尺度，<code>h(φ)=φ/(κ+φ)</code> 是风险感知函数。若想保持 <code>h(1)=1</code>，可用归一化版本 <code>h(φ)=(1+κ)φ/(κ+φ)</code>，但推导完全类似。</p>
+    </section>
+
+    <section class="issue">
+      <h3>6.2 动态规则与转移概率</h3>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <div class="formula-title">风险记忆</div>
+          <div class="formula">R<sub>e</sub>(t+1)=(1-λ)R<sub>e</sub>(t)+λh(Φ<sub>e</sub>(t))</div>
+          <div class="formula-note">群体行为响应的是平滑后的风险，而不是即时感染压力。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">活动响应</div>
+          <div class="formula">Θ<sub>e</sub>(t+1)=Θ<sub>e</sub>(t)[1-ηR<sub>e</sub>(t)]+γ[1-Θ<sub>e</sub>(t)]</div>
+          <div class="formula-note">当记忆风险高时，即使即时感染下降，群体也会继续低活动。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">节点避免感染</div>
+          <div class="formula">q<sub>i</sub>(t)=∏<sub>e∋i</sub>[1-Θ<sub>e</sub>(t)β∏<sub>j∈e,j≠i</sub>p<sub>j</sub>(t)]</div>
+          <div class="formula-note">传播层沿用原论文，保证可比较性。</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula-title">节点 MMCA</div>
+          <div class="formula">p<sub>i</sub>(t+1)=(1-p<sub>i</sub>)(1-q<sub>i</sub>)+(1-μ)p<sub>i</sub></div>
+          <div class="formula-note">新机制只改变活动反馈，不改变疾病状态空间。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>6.3 同质 MMCA、稳态方程与阈值</h3>
+      <p>令 <code>K=⟨k⟩</code>，同质变量为 <code>ρ(t)</code>、<code>Θ(t)</code>、<code>R(t)</code>：</p>
+      <div class="formula-grid">
+        <div class="formula-card">
+          <div class="formula">ρ(t+1)=(1-ρ){1-[1-Θβρ<sup>d-1</sup>]<sup>K</sup>}+(1-μ)ρ</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula">Θ(t+1)=Θ[1-ηR]+γ(1-Θ)</div>
+        </div>
+        <div class="formula-card">
+          <div class="formula">R(t+1)=(1-λ)R+λh(ρ<sup>d</sup>)</div>
+        </div>
+      </div>
+      <p>稳态满足：</p>
+      <div class="formula-card">
+        <div class="formula">
+          R*=h(ρ<sup>d</sup>), &nbsp;
+          Θ*=<span class="frac"><span>γ</span><span>γ+ηR*</span></span>, &nbsp;
+          μρ=(1-ρ){1-[1-Θ*βρ<sup>d-1</sup>]<sup>K</sup>}
+        </div>
+      </div>
+      <p>因此非线性阈值的参数形式为：</p>
+      <div class="formula-card">
+        <div class="formula">
+          β<sub>n</sub>=min<sub>ρ&gt;0</sub>
+          <span class="frac"><span>1-[1-μρ/(1-ρ)]<sup>1/K</sup></span><span>Θ*(ρ)ρ<sup>d-1</sup></span>
+        </div>
+        <div class="formula-note">与原模型相比，阈值中的 <code>Θ*(ρ)</code> 由 <code>h(ρ<sup>d</sup>)</code> 控制。<code>λ</code> 不改变固定点位置，但改变稳定性和振荡，这是本文可发表的新结论。</div>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>6.4 Jacobian、稳定性与分岔</h3>
+      <p>记 <code>a=1-Θβρ<sup>d-1</sup></code>，三维 Jacobian 在稳态处具有稀疏结构：</p>
+      <div class="formula-card">
+        <div class="formula">
+          J =
+          [ A, B, 0;
+            0, C, D;
+            E, 0, F ]
+        </div>
+        <div class="formula-note">
+          A=1-μ-(1-a<sup>K</sup>)+(1-ρ)Ka<sup>K-1</sup>Θβ(d-1)ρ<sup>d-2</sup>；
+          B=(1-ρ)Ka<sup>K-1</sup>βρ<sup>d-1</sup>；
+          C=1-γ-ηR；D=-ηΘ；E=λh'(ρ<sup>d</sup>)dρ<sup>d-1</sup>；F=1-λ。
+        </div>
+      </div>
+      <p>特征方程为：</p>
+      <div class="formula-card">
+        <div class="formula">(A-ξ)(C-ξ)(F-ξ)+BDE=0</div>
+        <div class="formula-note">因为 <code>D&lt;0</code>，记忆回路通过 <code>BDE</code> 改变特征值位置。稳定条件是全部特征值满足 <code>|ξ|&lt;1</code>。</div>
+      </div>
+      <p><b>分岔类型：</b></p>
+      <ul>
+        <li><b>saddle-node：</b>当 <code>ξ=1</code>，等价于稳态曲线发生切触，是原论文的一阶流行阈值。</li>
+        <li><b>Neimark-Sacker：</b>当一对复特征值穿过单位圆，出现记忆诱导的持续振荡或准周期波动。这是新模型相对原论文的核心可发表点。</li>
+        <li><b>双稳与滞后：</b>fold 仍可存在；记忆会改变吸引域边界，使同样初值下出现更长暂态、反弹或延迟清零。</li>
+      </ul>
+    </section>
+
+    <h2 id="experiments">七、实验设计：SCI Results 水平</h2>
+    <section class="issue">
+      <h3>7.1 基础验证</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>实验</th><th>横轴/纵轴</th><th>目的</th><th>应展示的结果</th></tr></thead>
+          <tbody>
+            <tr><td>理论 vs MC</td><td><code>β</code> vs 稳态 <code>ρ</code></td><td>验证三维 MMCA</td><td>曲线与符号点，200 次 MC 均值和 95% 置信区间。</td></tr>
+            <tr><td>时间演化</td><td><code>t</code> vs <code>ρ, Θ, R</code></td><td>展示记忆滞后</td><td><code>R</code> 滞后于 <code>ρ</code>，<code>Θ</code> 滞后恢复。</td></tr>
+            <tr><td>阈值扫描</td><td><code>β<sub>n</sub></code> vs <code>η,γ,κ</code></td><td>证明阈值可控</td><td>高 <code>η</code>、低 <code>γ</code>、强感知降低流行区。</td></tr>
+            <tr><td>稳定性相图</td><td><code>λ</code> - <code>η</code> 或 <code>λ</code> - <code>γ</code></td><td>定位稳定流行、振荡、无病区</td><td>用特征值谱半径与 MC 时间序列相互验证。</td></tr>
+            <tr><td>分岔图</td><td><code>β</code> 或 <code>λ</code> vs 局部极值 <code>ρ</code></td><td>识别 saddle-node 和 Neimark-Sacker</td><td>稳态分支、振荡振幅、滞后回线。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="issue">
+      <h3>7.2 参数敏感性、相变、热图与误差条</h3>
+      <ul>
+        <li><b>参数敏感性：</b>固定 <code>n=1500,d=3,μ=0.1,K=6,I(0)=0.3</code>，扫描 <code>λ∈[0.02,1]</code>、<code>κ∈[0.001,1]</code>、<code>η∈[0,1]</code>、<code>γ∈[0.005,0.08]</code>。重点看 <code>λ</code> 是否只改变暂态还是也诱发稳定性转换。</li>
+        <li><b>相图：</b>绘制 <code>(β,η)</code>、<code>(β,γ)</code>、<code>(λ,η)</code>、<code>(λ,κ)</code> 四组热图。颜色为最终 <code>ρ</code>，边界叠加解析 fold 线和数值 Neimark-Sacker 线。</li>
+        <li><b>相变：</b>做上扫和下扫 <code>β</code>，展示滞后环。对每个 <code>λ</code> 比较滞后宽度，证明记忆会改变突变路径。</li>
+        <li><b>稳态：</b>报告 <code>ρ*</code>、<code>Θ*</code>、<code>R*</code> 三个稳态量，不只画感染密度。这样读者能看到“风险记忆高但感染低”的恢复滞后状态。</li>
+        <li><b>时间演化：</b>近 fold 点、近 Neimark-Sacker 点、远离阈值点各选一组，画 <code>ρ,Θ,R</code>。建议加相位图 <code>ρ-R</code> 或 <code>ρ-Θ</code>。</li>
+        <li><b>误差条：</b>MC 每点至少 100-200 次。稳态取最后 20% 时间平均；误差条用跨运行标准误或 bootstrap 置信区间。</li>
+        <li><b>有限尺寸检查：</b>用 <code>n=500,1000,1500,3000</code> 检查突变位置和振荡幅度是否稳定，避免把有限尺寸吸收误判为无病态。</li>
+      </ul>
+    </section>
+
+    <section class="issue">
+      <h3>7.3 论文 Results 建议结构</h3>
+      <ol>
+        <li><b>Result 1：</b>记忆模型的 MMCA 与 MC 一致，复现原模型阈值并解释新状态变量。</li>
+        <li><b>Result 2：</b>风险记忆导致活动恢复滞后，延长或抑制流行暂态。</li>
+        <li><b>Result 3：</b>三维 Jacobian 预测 Neimark-Sacker 分岔，MC 观察到持续振荡或准周期波动。</li>
+        <li><b>Result 4：</b>记忆参数改变滞后宽度和吸引域，解释高初始感染清零与中等初始感染持久化的机制边界。</li>
+        <li><b>Result 5：</b>结合 SI/TI 策略，风险记忆可降低 HIT 或推迟反弹，给出控制启示。</li>
+      </ol>
+      <p><b>可发表性判断：</b>如果只做 Fig. 2-7 的重复扩展，贡献偏弱；如果能把 Jacobian 特征值、fold 线、Neimark-Sacker 线和 MC 振荡相图连成闭环，就有机会投复杂系统、非线性动力学或应用数学建模方向的较好期刊。</p>
+    </section>
+
+    <h2 id="sources">证据来源</h2>
+    <section class="summary source-list">
+      <ul>
+        <li>本地 PDF：<span class="path">/Volumes/markz/Desktop/fux/Li 等 - 2027 - Adaptive epidemic dynamics on hypergraphs with group-level immunization and rewiring.pdf</span></li>
+        <li>本地提取文本：<span class="path">/Volumes/markz/Desktop/fux/tmp/pdfs/paper_text.txt</span></li>
+        <li>arXiv 源文件包：<span class="path">/Volumes/markz/Desktop/fux/tmp/pdfs/arxiv_source/</span></li>
+        <li>公开论文页面：<a href="https://arxiv.org/abs/2606.15578">arXiv:2606.15578</a></li>
+        <li>本地检查：工作区无独立 Python、MATLAB、Julia、R、C/C++ 仿真代码；arXiv 源包仅含 TeX、参考文献和图像 PDF。</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.layout-with-toc').forEach(layout => {
+    const btn = layout.querySelector('.toc-toggle');
+    if (!btn) return;
+    const icon = btn.querySelector('.toc-toggle-icon');
+    const setCollapsed = collapsed => {
+      layout.classList.toggle('toc-collapsed', collapsed);
+      btn.setAttribute('aria-expanded', String(!collapsed));
+      btn.setAttribute('aria-label', collapsed ? '展开目录' : '收起目录');
+      btn.title = collapsed ? '展开目录' : '收起目录';
+      if (icon) icon.textContent = collapsed ? '›' : '‹';
+    };
+    btn.addEventListener('click', () => {
+      setCollapsed(!layout.classList.contains('toc-collapsed'));
+    });
+  });
+</script>
+</body>
+</html>
