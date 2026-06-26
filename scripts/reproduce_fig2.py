@@ -38,6 +38,8 @@ def main() -> None:
     data_dir = ensure_dir(out / "data")
     fig_dir = ensure_dir(out / "figures")
 
+    # quick 模式只用于检查代码能不能跑通；正式复现使用论文规模 n=1500、
+    # 更多 beta 采样点和更多 MC 重复。
     n = 300 if args.quick else 1500
     reps = args.reps if args.reps is not None else (3 if args.quick else 200)
     beta_points = 9 if args.quick else 36
@@ -52,6 +54,7 @@ def main() -> None:
     theory_curves: dict[int, np.ndarray] = {}
     mc_points: dict[int, tuple[np.ndarray, np.ndarray]] = {}
     for mean_k in mean_ks:
+        # 先按同质 MMCA 方程扫 beta，得到论文 Fig. 2(a) 的理论曲线。
         theory = homogeneous_stationary_curve(
             betas,
             mean_k=mean_k,
@@ -69,6 +72,7 @@ def main() -> None:
         if not args.skip_mc:
             means, errs = [], []
             for beta in betas:
+                # MC 点由随机超图和随机传播过程重新生成，不读取任何论文图像数据。
                 mean, err = replicate_mc_stationary(
                     n=n,
                     mean_k=mean_k,
@@ -85,11 +89,13 @@ def main() -> None:
                 rows.append(["mc", mean_k, f"{beta:.8g}", f"{mean:.8g}", f"{err:.8g}"])
             mc_points[mean_k] = (np.asarray(means), np.asarray(errs))
 
+    # 保存 Fig. 2(a) 的全部理论/MC 数据，便于后续检查和重新绘图。
     save_csv(data_dir / "fig2_stationary.csv", ["kind", "mean_k", "beta", "rho", "stderr"], rows)
 
     ts_rows: list[list[object]] = []
     ts_data = {}
     for beta in [0.08, 0.10]:
+        # 论文 Fig. 2(b,c) 固定 <k>=12，并比较 beta=0.08 与 beta=0.10。
         rho_m, _theta = homogeneous_mmca(
             beta=beta,
             mean_k=12,
@@ -106,6 +112,7 @@ def main() -> None:
         if not args.skip_mc:
             traces = []
             for rep in range(reps):
+                # 时间序列图使用相同参数重复若干次 MC，再对 rho(t) 逐时刻平均。
                 hg = random_uniform_hypergraph(n=n, m=int(round(n * 12 / d)), d=d, seed=args.seed + rep + int(beta * 1000))
                 result = mc_sis(
                     hg,
@@ -120,6 +127,7 @@ def main() -> None:
             ts_data[(beta, "mc")] = avg
             for t, rho in enumerate(avg):
                 ts_rows.append(["mc", beta, t, f"{rho:.8g}", f"{1-rho:.8g}"])
+    # 保存 Fig. 2(b,c) 的时间序列数据。
     save_csv(data_dir / "fig2_timeseries.csv", ["kind", "beta", "t", "rho_i", "rho_s"], ts_rows)
 
     try:
@@ -133,6 +141,7 @@ def main() -> None:
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.4), constrained_layout=True)
     ax = axes[0]
+    # 左图：曲线是 MMCA，点和误差条是 MC 均值及标准误。
     for mean_k in mean_ks:
         ax.plot(betas, theory_curves[mean_k], label=f"MMCA <k>={mean_k}")
         if mean_k in mc_points:
@@ -147,6 +156,7 @@ def main() -> None:
         ax = axes[idx]
         rho_m = ts_data[(beta, "mmca")]
         t = np.arange(rho_m.size)
+        # 中/右图：同时画易感比例 S=1-rho 和感染比例 I=rho。
         ax.plot(t, 1 - rho_m, color="#0f766e", label="MMCA S")
         ax.plot(t, rho_m, color="#dc2626", label="MMCA I")
         if (beta, "mc") in ts_data:

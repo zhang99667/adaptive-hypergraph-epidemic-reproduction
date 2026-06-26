@@ -21,6 +21,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def stationary(beta: float, eta: float, gamma: float, rho0: float, steps: int) -> float:
+    # Fig. 3 的热图只需要稳态感染密度，因此调用同质 MMCA 后取末尾均值。
     rho, _ = homogeneous_mmca(beta=beta, mean_k=6, d=3, mu=0.1, eta=eta, gamma=gamma, rho0=rho0, steps=steps)
     return float(np.mean(rho[int(0.8 * len(rho)) :]))
 
@@ -36,11 +37,13 @@ def main() -> None:
     rows: list[list[object]] = []
     ts = {}
     for rho0, eta in [(0.2, 0.6), (0.2, 0.8), (0.8, 0.6), (0.8, 0.8)]:
+        # 上排左图：固定 gamma，比较不同初值和 eta 的时间演化。
         rho, _ = homogeneous_mmca(beta=0.2, mean_k=6, d=3, mu=0.1, eta=eta, gamma=0.02, rho0=rho0, steps=steps)
         ts[("eta", rho0, eta)] = rho
         for t, val in enumerate(rho):
             rows.append(["eta_ts", rho0, eta, 0.02, 0.2, t, f"{val:.8g}"])
     for rho0, gamma in [(0.2, 0.02), (0.2, 0.03), (0.8, 0.02), (0.8, 0.03)]:
+        # 下排左图：固定 eta，比较不同初值和 gamma 的时间演化。
         rho, _ = homogeneous_mmca(beta=0.2, mean_k=6, d=3, mu=0.1, eta=0.6, gamma=gamma, rho0=rho0, steps=steps)
         ts[("gamma", rho0, gamma)] = rho
         for t, val in enumerate(rho):
@@ -52,6 +55,7 @@ def main() -> None:
     heat_eta = {}
     heat_gamma = {}
     for rho0 in [0.2, 0.8]:
+        # beta-eta 热图：每个格点都由 MMCA 方程重新迭代到稳态。
         h = np.zeros((etas.size, betas.size))
         for i, eta in enumerate(etas):
             for j, beta in enumerate(betas):
@@ -59,6 +63,7 @@ def main() -> None:
                 rows.append(["eta_heat", rho0, f"{eta:.8g}", 0.02, f"{beta:.8g}", -1, f"{h[i,j]:.8g}"])
         heat_eta[rho0] = h
 
+        # beta-gamma 热图：观察活动恢复率 gamma 对稳态流行区的影响。
         g = np.zeros((gammas.size, betas.size))
         for i, gamma in enumerate(gammas):
             for j, beta in enumerate(betas):
@@ -66,6 +71,7 @@ def main() -> None:
                 rows.append(["gamma_heat", rho0, 0.6, f"{gamma:.8g}", f"{beta:.8g}", -1, f"{g[i,j]:.8g}"])
         heat_gamma[rho0] = g
 
+    # 一个 CSV 同时保存时间序列和热图格点；kind 字段用于区分数据来源。
     save_csv(data_dir / "fig3_adaptive_scans.csv", ["kind", "rho0", "eta", "gamma", "beta", "t", "rho"], rows)
 
     try:
@@ -79,6 +85,7 @@ def main() -> None:
 
     fig, axes = plt.subplots(2, 3, figsize=(11, 6.3), constrained_layout=True)
     ax = axes[0, 0]
+    # 第一列画时间演化；横轴用 log 尺度，对应论文中强调早期和长期暂态。
     for key, rho in ts.items():
         kind, rho0, eta = key
         if kind == "eta":
@@ -90,6 +97,7 @@ def main() -> None:
     ax.legend(fontsize=7)
 
     for col, rho0 in enumerate([0.2, 0.8], start=1):
+        # 上排右两图：不同初值下 beta-eta 的稳态感染密度。
         im = axes[0, col].imshow(
             heat_eta[rho0],
             origin="lower",
@@ -116,6 +124,7 @@ def main() -> None:
     ax.legend(fontsize=7)
 
     for col, rho0 in enumerate([0.2, 0.8], start=1):
+        # 下排右两图：不同初值下 beta-gamma 的稳态感染密度。
         im = axes[1, col].imshow(
             heat_gamma[rho0],
             origin="lower",

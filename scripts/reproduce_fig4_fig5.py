@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def strategy_spec(name: str) -> tuple[str, float]:
+    # 返回核心 MC 函数需要的干预类型，以及 SI 策略对应的活动阈值。
     if name == "random":
         return "random", 0.0
     if name == "ti":
@@ -58,6 +59,7 @@ def run_point(
     si_sort: str,
 ) -> tuple[float, float]:
     intervention, theta_min = strategy_spec(strategy)
+    # Fig. 4-5 固定 mu=0.1、eta=0.6，只改变 beta/gamma/w/策略。
     params = ModelParams(beta=beta, mu=0.1, eta=0.6, gamma=gamma)
     return replicate_mc_stationary(
         n=n,
@@ -84,6 +86,8 @@ def main() -> None:
     data_dir = ensure_dir(out / "data")
     fig_dir = ensure_dir(out / "figures")
 
+    # quick 模式只做粗网格、小网络、少重复，方便快速看流程是否正确；
+    # 正式复现去掉 --quick 后回到论文规模和更密参数网格。
     n = 180 if args.quick else 1500
     reps = args.reps if args.reps is not None else (2 if args.quick else 200)
     steps = 180 if args.quick else 1100
@@ -100,6 +104,7 @@ def main() -> None:
         for strategy in strategies:
             vals, errs = [], []
             for w in ws:
+                # Fig. 4：固定 beta=0.35，扫描免疫预算 w，比较不同策略。
                 mean, err = run_point(
                     n=n,
                     mean_k=mean_k,
@@ -119,6 +124,7 @@ def main() -> None:
                 rows.append(["fig4", mean_k, gamma, strategy, f"{w:.8g}", 0.35, 0.3, f"{mean:.8g}", f"{err:.8g}"])
             fig4[(mean_k, gamma, strategy)] = (np.asarray(vals), np.asarray(errs))
 
+    # Fig. 5：对每个 beta 逐步提高 w，找到让稳态感染低于 hit_eps 的最小 w。
     betas = np.linspace(0.25, 0.40, 4 if args.quick else 25)
     w_grid = np.linspace(0, 1, 6 if args.quick else 51)
     hit = {}
@@ -129,6 +135,7 @@ def main() -> None:
             for beta in betas:
                 wc = 1.0
                 for w in w_grid:
+                    # 这里每个 (beta,w,strategy) 都重新跑 MC，不读取 Fig. 4 的曲线。
                     mean, err = run_point(
                         n=n,
                         mean_k=6,
@@ -151,6 +158,7 @@ def main() -> None:
                 rows.append(["fig5_wc", 6, 0.02, strategy, f"{wc:.8g}", f"{beta:.8g}", rho0, "", ""])
             hit[(rho0, strategy)] = np.asarray(wc_values)
 
+    # 所有扫描点都保存到同一个 CSV；kind 字段区分 Fig. 4 曲线、Fig. 5 扫描点和 HIT 结果。
     save_csv(
         data_dir / "fig4_fig5_immunization.csv",
         ["kind", "mean_k", "gamma", "strategy", "w", "beta", "rho0", "rho", "stderr"],
@@ -169,6 +177,7 @@ def main() -> None:
     labels = {"ti": "TI", "random": "Random", "si1": "SI1", "si2": "SI2", "si3": "SI3"}
     fig, axes = plt.subplots(2, 2, figsize=(8.5, 6.2), constrained_layout=True)
     for ax, (mean_k, gamma) in zip(axes.ravel(), settings):
+        # 四个子图对应论文给出的 (<k>, gamma) 组合。
         for strategy in strategies:
             vals, errs = fig4[(mean_k, gamma, strategy)]
             ax.errorbar(ws, vals, yerr=errs, marker="o", ms=3, capsize=2, label=labels[strategy])
@@ -181,6 +190,7 @@ def main() -> None:
 
     fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.4), constrained_layout=True)
     for ax, rho0 in zip(axes, [0.3, 0.5]):
+        # 两个子图比较不同初始感染比例下的 herd immunity threshold。
         for strategy in strategies:
             ax.plot(betas, hit[(rho0, strategy)], marker="o", ms=3, label=labels[strategy])
         ax.set_title(f"I(0)={rho0}")

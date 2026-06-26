@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def degree_hist(deg: np.ndarray, max_k: int = 25) -> tuple[np.ndarray, np.ndarray]:
+    # 度分布只用于画图展示；超过 max_k 的尾部合并到最后一个 bin。
     bins = np.arange(max_k + 2)
     counts, edges = np.histogram(np.clip(deg, 0, max_k), bins=bins)
     return edges[:-1], counts / counts.sum()
@@ -50,8 +51,11 @@ def main() -> None:
     data = {}
 
     for mode in ["random", "preferential"]:
+        # 两种 rewiring 从同一个随机超图种子出发，便于比较干预后的结构差异。
         hg = random_uniform_hypergraph(n=n, m=m, d=d, seed=args.seed)
         deg_before = hg.hyperdegrees().copy()
+        # burn-in 到 intervention_start 后，用 TI 移除 w=0.8 的超边，
+        # 然后立即按 mode 生成替换超边。
         result = mc_sis(
             hg,
             params,
@@ -68,13 +72,16 @@ def main() -> None:
         )
         deg_after = result.hypergraph.hyperdegrees()
         data[mode] = (result.rho, deg_before, deg_after)
+        # 保存感染时间序列。
         for t, rho in enumerate(result.rho):
             rows.append(["rho", mode, t, f"{rho:.8g}", "", ""])
+        # 保存干预前后的度分布，供 Fig. 6 右侧子图使用。
         for stage, deg in [("before", deg_before), ("after", deg_after)]:
             xs, ps = degree_hist(deg, max_k=25 if not args.quick else 18)
             for k, p in zip(xs, ps):
                 rows.append(["degree", mode, -1, "", stage, f"{k}:{p:.8g}"])
 
+    # 同一 CSV 同时记录 rho(t) 和 P(k)，kind 字段区分两类数据。
     save_csv(data_dir / "fig6_rewiring.csv", ["kind", "mode", "t", "rho", "stage", "value"], rows)
 
     try:
@@ -90,6 +97,7 @@ def main() -> None:
     for row, mode in enumerate(["random", "preferential"]):
         rho, deg_before, deg_after = data[mode]
         ax = axes[row, 0]
+        # 左列：干预时刻用虚线标出，观察 rewiring 后感染是否反弹。
         ax.plot(rho, color="#1d4ed8", label="infection density")
         ax.axvline(intervention_start, color="k", ls="--", lw=1, label="intervention")
         ax.set_title(f"{mode} rewiring")
@@ -98,6 +106,7 @@ def main() -> None:
         ax.legend(fontsize=7)
 
         ax = axes[row, 1]
+        # 右列：比较 rewiring 前后的超度分布。
         for deg, stage, color in [(deg_before, "before", "#1d4ed8"), (deg_after, "after", "#dc2626")]:
             xs, ps = degree_hist(deg, max_k=25 if not args.quick else 18)
             ax.plot(xs, ps, marker="o", ms=3, label=stage, color=color)
