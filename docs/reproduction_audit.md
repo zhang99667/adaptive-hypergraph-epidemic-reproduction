@@ -1,38 +1,27 @@
-# Reproduction Audit
+# 复现审计说明
 
-This repository is intended to reproduce the model from the paper equations and
-reported simulation settings, not by digitizing or copying the paper's plotted
-points.
+这个仓库的目标是“从论文模型本身复现”，而不是把论文图中的曲线点读出来再画一遍。
 
-## What Was Checked
+## 已检查内容
 
-- `src/` and `scripts/` do not read the local publisher PDF.
-- `src/` and `scripts/` do not read extracted page images or arXiv figure PDFs.
-- Reproduction scripts do not call image readers such as `imread` or
-  `Image.open`.
-- Reproduction scripts do not read precomputed figure CSV files as inputs.
-- Hard-coded numeric values in the scripts are experiment settings stated in the
-  paper text and captions, such as `n=1500`, `d=3`, `mu=0.1`, `eta=0.6`,
-  `gamma=0.02`, `I(0)=0.3`, `<k>=6,9,12`, and the scan ranges used for figures.
+- `src/` 和 `scripts/` 不读取本地出版社 PDF。
+- `src/` 和 `scripts/` 不读取 PDF 页面截图、arXiv 源文件里的图像 PDF，或任何论文图像文件。
+- 复现脚本不调用 `imread`、`Image.open` 这类图像读取函数。
+- 复现脚本不把 `outputs/data/` 里已有 CSV 当作输入数据。
+- 脚本里的硬编码数值是论文正文和图注给出的实验设置，例如 `n=1500`、`d=3`、`mu=0.1`、`eta=0.6`、`gamma=0.02`、`I(0)=0.3`、`<k>=6,9,12` 以及各图使用的参数扫描范围。
 
-## Guardrail
-
-Run:
+## 审计命令
 
 ```bash
 python scripts/audit_no_figure_inputs.py
 ```
 
-Expected output:
+期望输出：
 
 ```text
-audit ok: no paper figure/PDF extraction inputs found in tracked source
+审计通过：未发现源码读取论文图像或 PDF 提取物作为输入
 ```
 
-## Remaining Scientific Caveat
+## 仍然需要注意的科学边界
 
-The author code and raw empirical congressional cosponsorship hypergraph are not
-public in the provided materials. Therefore this repository is an independent
-implementation from the paper's equations and algorithm descriptions. Where the
-paper leaves implementation details ambiguous, the convention is documented in
-`README.md` and `README_reproduction.md`.
+作者原始代码和 Fig. 7 使用的经验超图数据没有在当前材料中公开。因此本仓库是基于论文方程和算法描述的独立实现。对于论文没有写清楚的实现细节，本仓库会在 `README.md` 和 `README_reproduction.md` 中明确记录所采用的约定。

@@ -23,8 +23,8 @@ from adaptive_hypergraph.model import (
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Reproduce paper Fig. 2 synthetic MMCA vs MC.")
-    p.add_argument("--quick", action="store_true", help="small fast run")
+    p = argparse.ArgumentParser(description="复现论文 Fig. 2 风格实验：MMCA 理论曲线 vs MC 仿真。")
+    p.add_argument("--quick", action="store_true", help="使用小网络和少量重复，快速检查代码链路")
     p.add_argument("--reps", type=int, default=None)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--skip-mc", action="store_true")
@@ -128,7 +128,7 @@ def main() -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as exc:  # pragma: no cover - depends on local env
-        print(f"data saved, plotting skipped: {exc}")
+        print(f"数据已保存，但绘图被跳过：{exc}")
         return
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.4), constrained_layout=True)
@@ -160,7 +160,7 @@ def main() -> None:
         ax.legend(fontsize=7)
 
     fig.savefig(fig_dir / "fig2_reproduction.png", dpi=220)
-    print(f"saved {fig_dir / 'fig2_reproduction.png'}")
+    print(f"已保存 {fig_dir / 'fig2_reproduction.png'}")
 
 
 if __name__ == "__main__":

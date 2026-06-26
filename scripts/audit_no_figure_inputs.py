@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Audit that reproduction scripts do not use paper figures as data inputs.
+"""检查复现脚本是否把论文图当作数据输入。
 
-This is a lightweight guardrail for the public reproduction repo. It checks the
-tracked runnable source files under src/ and scripts/ for references to local PDF
-extraction artifacts, arXiv figure directories, image digitization, or
-data-loading calls that would indicate the plotted points were read from existing
-figures instead of generated from the paper equations and simulations.
+这个脚本是 public 仓库里的一个轻量 guardrail。它只检查 src/ 和 scripts/
+下会被运行的源码，确保里面没有引用本地 PDF 提取物、arXiv 图目录、图像
+数字化工具，或把已有图表数据读回来的输入逻辑。换句话说，复现结果应该
+来自论文方程和仿真规则，而不是来自已经画好的论文图片。
 """
 
 from __future__ import annotations
@@ -77,7 +76,7 @@ def audit_text(files: list[Path]) -> list[str]:
         text = path.read_text(encoding="utf-8")
         for token in FORBIDDEN_TEXT:
             if token in text and rel.as_posix() != "scripts/audit_no_figure_inputs.py":
-                errors.append(f"{rel}: forbidden token {token!r}")
+                errors.append(f"{rel}: 出现禁止文本 {token!r}")
     return errors
 
 
@@ -94,7 +93,7 @@ def audit_python_calls(files: list[Path]) -> list[str]:
             name = dotted_name(node.func)
             tail = name.rsplit(".", 1)[-1]
             if tail in FORBIDDEN_CALLS:
-                errors.append(f"{rel}:{node.lineno}: forbidden reader call {name}()")
+                errors.append(f"{rel}:{node.lineno}: 出现禁止读取函数 {name}()")
     return errors
 
 
@@ -102,11 +101,11 @@ def main() -> None:
     files = tracked_files()
     errors = audit_text(files) + audit_python_calls(files)
     if errors:
-        print("audit failed:")
+        print("审计失败：")
         for error in errors:
             print(f"- {error}")
         raise SystemExit(1)
-    print("audit ok: no paper figure/PDF extraction inputs found in tracked source")
+    print("审计通过：未发现源码读取论文图像或 PDF 提取物作为输入")
 
 
 if __name__ == "__main__":

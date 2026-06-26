@@ -1,4 +1,4 @@
-"""Reproduction utilities for adaptive epidemic dynamics on hypergraphs."""
+"""自适应超图传播动力学复现工具包。"""
 
 from .model import (
     Hypergraph,

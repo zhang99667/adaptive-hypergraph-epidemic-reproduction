@@ -20,7 +20,7 @@ from adaptive_hypergraph.model import (
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Reproduce paper Fig. 6 rewiring comparison.")
+    p = argparse.ArgumentParser(description="复现论文 Fig. 6 风格实验：随机重连与度优先重连对比。")
     p.add_argument("--quick", action="store_true")
     p.add_argument("--seed", type=int, default=321)
     p.add_argument("--outdir", default="outputs")
@@ -83,7 +83,7 @@ def main() -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as exc:
-        print(f"data saved, plotting skipped: {exc}")
+        print(f"数据已保存，但绘图被跳过：{exc}")
         return
 
     fig, axes = plt.subplots(2, 2, figsize=(8.5, 6.2), constrained_layout=True)
@@ -107,7 +107,7 @@ def main() -> None:
         ax.legend(fontsize=7)
 
     fig.savefig(fig_dir / "fig6_reproduction.png", dpi=220)
-    print(f"saved {fig_dir / 'fig6_reproduction.png'}")
+    print(f"已保存 {fig_dir / 'fig6_reproduction.png'}")
 
 
 if __name__ == "__main__":

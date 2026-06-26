@@ -19,7 +19,7 @@ from adaptive_hypergraph.model import (
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Reproduce paper Figs. 4-5 immunization scans.")
+    p = argparse.ArgumentParser(description="复现论文 Fig. 4-5 风格实验：免疫策略和 HIT 扫描。")
     p.add_argument("--quick", action="store_true")
     p.add_argument("--reps", type=int, default=None)
     p.add_argument("--seed", type=int, default=123)
@@ -163,7 +163,7 @@ def main() -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as exc:
-        print(f"data saved, plotting skipped: {exc}")
+        print(f"数据已保存，但绘图被跳过：{exc}")
         return
 
     labels = {"ti": "TI", "random": "Random", "si1": "SI1", "si2": "SI2", "si3": "SI3"}
@@ -189,7 +189,7 @@ def main() -> None:
         ax.set_ylim(0, 1.02)
         ax.legend(fontsize=7)
     fig.savefig(fig_dir / "fig5_reproduction.png", dpi=220)
-    print(f"saved {fig_dir / 'fig4_reproduction.png'} and {fig_dir / 'fig5_reproduction.png'}")
+    print(f"已保存 {fig_dir / 'fig4_reproduction.png'} 和 {fig_dir / 'fig5_reproduction.png'}")
 
 
 if __name__ == "__main__":

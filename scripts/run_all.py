@@ -8,9 +8,9 @@ from pathlib import Path
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Run all reproduction scripts.")
+    p = argparse.ArgumentParser(description="依次运行全部复现脚本。")
     p.add_argument("--quick", action="store_true")
-    p.add_argument("--skip-mc", action="store_true", help="only applies to Fig. 2")
+    p.add_argument("--skip-mc", action="store_true", help="只对 Fig. 2 生效：跳过 MC 点，仅画 MMCA 理论曲线")
     return p.parse_args()
 
 

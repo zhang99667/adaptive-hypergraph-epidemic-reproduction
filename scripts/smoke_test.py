@@ -34,7 +34,7 @@ def main() -> None:
         rewiring="preferential",
     )
     assert 0 <= rewired.stationary_rho <= 1
-    print("smoke ok")
+    print("smoke test 通过")
 
 
 if __name__ == "__main__":

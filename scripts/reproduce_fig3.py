@@ -14,7 +14,7 @@ from adaptive_hypergraph.model import ensure_dir, homogeneous_mmca, save_csv
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Reproduce paper Fig. 3 adaptive parameter scans.")
+    p = argparse.ArgumentParser(description="复现论文 Fig. 3 风格实验：初始条件和自适应参数扫描。")
     p.add_argument("--quick", action="store_true")
     p.add_argument("--outdir", default="outputs")
     return p.parse_args()
@@ -74,7 +74,7 @@ def main() -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except Exception as exc:
-        print(f"data saved, plotting skipped: {exc}")
+        print(f"数据已保存，但绘图被跳过：{exc}")
         return
 
     fig, axes = plt.subplots(2, 3, figsize=(11, 6.3), constrained_layout=True)
@@ -131,7 +131,7 @@ def main() -> None:
         fig.colorbar(im, ax=axes[1, col], label=r"$\rho^I$")
 
     fig.savefig(fig_dir / "fig3_reproduction.png", dpi=220)
-    print(f"saved {fig_dir / 'fig3_reproduction.png'}")
+    print(f"已保存 {fig_dir / 'fig3_reproduction.png'}")
 
 
 if __name__ == "__main__":
